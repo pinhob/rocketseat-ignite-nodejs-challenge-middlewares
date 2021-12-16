@@ -24,7 +24,17 @@ function checksExistsUserAccount(request, response, next) {
 }
 
 function checksCreateTodosUserAvailability(request, response, next) {
-  // Complete aqui
+  const { user } = request;
+
+  const freePlan = user.pro === false;
+  const todosQuantity = user.todos.length;
+  const TEN = 10;
+
+  if (freePlan && todosQuantity >= TEN) {
+    return response.status(403).json({ error: "More than 10 todos createds" });
+  }
+
+  return next();
 }
 
 function checksTodoExists(request, response, next) {
