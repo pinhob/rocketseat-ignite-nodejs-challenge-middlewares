@@ -38,7 +38,33 @@ function checksCreateTodosUserAvailability(request, response, next) {
 }
 
 function checksTodoExists(request, response, next) {
-  // Complete aqui
+  const { username } = request.headers;
+  const { id } = request.params;
+
+  const usernameAlreadyExists = users.find((user) => user.username === username);
+
+  if (!usernameAlreadyExists) {
+    return response.status(404).json({ error: 'Username does not exist' });
+  }
+
+  const uuidValidFormatRegex = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/gi;
+
+  const uuidIsValid = uuidValidFormatRegex.test(id);
+
+  if (!uuidIsValid) {
+    return response.status(400).status({ error: "Id is not in a valid UUID format" });
+  }
+
+  const todoAlreadyExists = usernameAlreadyExists.todos.find((todo) => todo.id === id);
+
+  if (!todoAlreadyExists) {
+    return response.status(404).json({ error: 'Todo does not exist' });
+  }
+
+  request.user = usernameAlreadyExists;
+  request.todo = todoAlreadyExists;
+
+  return next();
 }
 
 function findUserById(request, response, next) {
